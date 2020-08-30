@@ -1,4 +1,5 @@
 # coding: utf-8
+import requests
 import os
 from bs4 import BeautifulSoup
 
@@ -51,12 +52,36 @@ def get_item_price_by_name(soup, item_name = ''):
     item_price = soup.find('div', string = item_name).next_sibling.next_sibling
     print('Item: {} - Price: {}'.format(item_name, item_price.text))
     
+def update_item_name(soup, item_name = '', new_item_name = ''):
+    div = soup.find('div', string = item_name).parent
+    print(f'----> Changing Item name for the item: {item_name}')
+    div.div.string = new_item_name
+    print(div)
+
+def insert_new_item(soup, item_name = '', item_price = ''):
+    print('----> Creating the New Item Container')
+    div_container = soup.new_tag('div', title = 'buyer-info')
+    div_item = soup.new_tag('div', title = 'buyer-name')
+    div_item.string = item_name
+    span_item_price = soup.new_tag('span', attrs = {'class': 'item-price'})
+    span_item_price.string = item_price
+    div_container.append('\n')
+    div_container.append(div_item)
+    div_container.append('\n')
+    div_container.append(span_item_price)
+    div_container.append('\n')
+    print('----> Adding the New Item')
+    soup.body.insert(2, div_container)
+    print(soup.prettify())
+    
 
 if __name__ == '__main__':
     if 'econpy.html' not in os.listdir('./data/'):
         get_page_content(URL)
     soup = read_file()
-    get_item_price_by_name(soup, 'Carson Busses')
+    update_item_name(soup, 'Carson Busses', 'New Item')
+    insert_new_item(soup, '2nd Item', '$19.30')
+
         
 
 
